@@ -16,12 +16,15 @@ $username = $users;
 $status = 'Open';
 
 
-$query = ("INSERT INTO tiket(notiket,tanggal,judul,deskripsi,kodekategori,username,status)
-                    VALUES ('".$notiket."','".$tanggal."','".$judul."','".$deskripsi."','".$kodekategori."','".$username."','".$status."')");
-if(!mysqli_query($mysqli,$query)){
-die(mysqli_error($mysqli));
+// Use prepared statement to prevent SQL injection
+$stmt = $mysqli->prepare("INSERT INTO tiket(notiket, tanggal, judul, deskripsi, kodekategori, username, status) VALUES (?, ?, ?, ?, ?, ?, ?)");
+$stmt->bind_param("sssssss", $notiket, $tanggal, $judul, $deskripsi, $kodekategori, $username, $status);
+
+if(!$stmt->execute()){
+    die($mysqli->error);
 }else{
-echo '<script>alert("Data Berhasil Ditambahkan !!!");
-window.location.href="../../index.php?page=datatiket_users"</script>';
+    echo '<script>alert("Data Berhasil Ditambahkan !!!");
+    window.location.href="../../index.php?page=datatiket_users"</script>';
 }
+$stmt->close();
 }

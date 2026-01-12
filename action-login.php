@@ -1,6 +1,6 @@
 <?php       
     // memulai session
-    // session_start();
+    session_start();
 
     // mengambil isian dari form login
     $username = $_POST['username'];
@@ -10,15 +10,20 @@
     if ($mysqli -> connect_errno) {
         echo "Failed to connect to MySQL: " . $mysqli -> connect_error;
         exit();
-      }
-    $query=mysqli_query($mysqli, "SELECT * FROM users USR 
-    WHERE USR.username = '$username' AND USR.pass = md5('$password')");    
-    $rows = mysqli_num_rows($query);      
+    }
+    
+    // Use prepared statement to prevent SQL injection
+    $stmt = $mysqli->prepare("SELECT * FROM users WHERE username = ? AND pass = MD5(?)");
+    $stmt->bind_param("ss", $username, $password);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $rows = $result->num_rows;
+    
     // pengecekan kredensial login    
     if ($rows == 1) {
         session_start();
         $_SESSION['username'] = $username;  
-        while ($row=mysqli_fetch_array($query,MYSQLI_ASSOC))
+        while ($row = $result->fetch_assoc())
         {
             $_SESSION['nama'] = $row['nama'];
             $_SESSION['akses'] = $row['akses'];            
@@ -28,4 +33,5 @@
     else {
         header("Location: login.php");        
    }
+   $stmt->close();
 ?>

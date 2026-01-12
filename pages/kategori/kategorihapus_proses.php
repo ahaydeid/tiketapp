@@ -5,11 +5,15 @@ if($_POST)
 $kodekategori = $_POST['kodekategori'];
 $kategori = $_POST['kategori'];
 
-$query = ("delete from kategori where kodekategori = '".$kodekategori ."'");
-if(!mysqli_query($mysqli,$query)){
-die(mysqli_error($mysqli));
+// Use prepared statement to prevent SQL injection
+$stmt = $mysqli->prepare("DELETE FROM kategori WHERE kodekategori = ?");
+$stmt->bind_param("s", $kodekategori);
+
+if(!$stmt->execute()){
+    die($mysqli->error);
 }else{
-echo '<script>alert("Data Berhasil Dihapus !!!");
-window.location.href="../../index.php?page=data_kategori"</script>';
+    echo '<script>alert("Data Berhasil Dihapus !!!");
+    window.location.href="../../index.php?page=data_kategori"</script>';
 }
+$stmt->close();
 }

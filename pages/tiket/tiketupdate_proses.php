@@ -11,12 +11,16 @@ $notiket = $_POST['notiket'];
 $status = $_POST['status'];
 
 
-$query = ("update tiket set status = '".$status."'where notiket = '".$notiket."'");
-if(!mysqli_query($mysqli,$query)){
-die(mysqli_error($mysqli));
+// Use prepared statement to prevent SQL injection
+$stmt = $mysqli->prepare("UPDATE tiket SET status = ? WHERE notiket = ?");
+$stmt->bind_param("ss", $status, $notiket);
+
+if(!$stmt->execute()){
+    die($mysqli->error);
 }else{
-echo '<script>alert("Update status sukses !!!");
-window.location.href="../../index.php?page=data_tiket"</script>';
+    echo '<script>alert("Update status sukses !!!");
+    window.location.href="../../index.php?page=data_tiket"</script>';
 }
+$stmt->close();
 }
 ?>

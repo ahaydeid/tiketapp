@@ -9,11 +9,15 @@ $tanggalhariini = date ('Y-m-d H:i:s');
 $notiket = $_POST['notiket'];
 $status = $_POST['status'];
 
-$query = ("delete from tiket where notiket = '".$notiket ."'");
-if(!mysqli_query($mysqli,$query)){
-die(mysqli_error($mysqli));
+// Use prepared statement to prevent SQL injection
+$stmt = $mysqli->prepare("DELETE FROM tiket WHERE notiket = ?");
+$stmt->bind_param("s", $notiket);
+
+if(!$stmt->execute()){
+    die($mysqli->error);
 }else{
-echo '<script>alert("Data Berhasil Dihapus !!!");
-window.location.href="../../index.php?page=data_tiket"</script>';
+    echo '<script>alert("Data Berhasil Dihapus !!!");
+    window.location.href="../../index.php?page=data_tiket"</script>';
 }
+$stmt->close();
 }

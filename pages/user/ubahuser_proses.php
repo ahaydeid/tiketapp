@@ -7,13 +7,15 @@ $nama = $_POST['nama'];
 $pass = $_POST['pass'];
 $akses = $_POST['akses'];
 
-$query = ("update users set nama = '".$nama."',
-akses = '".$akses."'
-where username = '".$username ."'");
-if(!mysqli_query($mysqli,$query)){
-die(mysqli_error($mysqli));
+// Use prepared statement to prevent SQL injection
+$stmt = $mysqli->prepare("UPDATE users SET nama = ?, akses = ? WHERE username = ?");
+$stmt->bind_param("sss", $nama, $akses, $username);
+
+if(!$stmt->execute()){
+    die($mysqli->error);
 }else{
-echo '<script>alert("Data Berhasil Diubah !!!");
-window.location.href="../../index.php?page=data_user"</script>';
+    echo '<script>alert("Data Berhasil Diubah !!!");
+    window.location.href="../../index.php?page=data_user"</script>';
 }
+$stmt->close();
 }
